@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rejestracja - Nep-gappa</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <nav class="navbar">
+                <div class="nav-brand">
+                    <h1><a href="/">🍜 Nep-gappa</a></h1>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <div class="auth-container">
+                <div class="auth-form">
+                    <h2>Rejestracja</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="username">Nazwa użytkownika:</label>
+                            <input type="text" id="username" name="username" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="fullName">Imię i nazwisko:</label>
+                            <input type="text" id="fullName" name="fullName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Numer telefonu:</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="+48 123 456 789" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Hasło:</label>
+                            <input type="password" id="password" name="password" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Powtórz hasło:</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large">Zarejestruj się</button>
+                        <div id="registerError" class="error-message" style="display: none;"></div>
+                        <div id="registerSuccess" class="success-message" style="display: none;"></div>
+                    </form>
+                    <p class="auth-link">
+                        Masz już konto? <a href="/login.html">Zaloguj się</a>
+                    </p>
+                    <p class="auth-link">
+                        <a href="/">Powrót na stronę główną</a>
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const userData = Object.fromEntries(formData);
+            
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+            
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            // Validate passwords match
+            if (userData.password !== userData.confirmPassword) {
+                errorDiv.textContent = 'Hasła nie są identyczne';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Remove confirmPassword before sending
+            delete userData.confirmPassword;
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    successDiv.textContent = result.message + ' - możesz się teraz zalogować';
+                    successDiv.style.display = 'block';
+                    document.getElementById('registerForm').reset();
+                } else {
+                    errorDiv.textContent = result.error;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Wystąpił błąd podczas rejestracji';
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
