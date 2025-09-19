@@ -69,6 +69,33 @@ function initializeData() {
   if (Object.keys(orders).length === 0) {
     saveData('orders.json', {})
   }
+
+  // Availability
+  const availability = loadData('availability.json')
+  if (Object.keys(availability).length === 0) {
+    // Initialize with some default availability data
+    const today = new Date()
+    const defaultAvailability: any = {}
+    
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today)
+      date.setDate(today.getDate() + i)
+      const dateString = date.toISOString().split('T')[0]
+      
+      const timeSlots = [
+        '09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
+        '15:00', '16:00', '17:00', '18:00', '19:00'
+      ]
+      
+      defaultAvailability[dateString] = {
+        id: `avail-${i}`,
+        date: dateString,
+        slots: JSON.stringify(timeSlots) // Store as JSON string for SQLite compatibility
+      }
+    }
+    
+    saveData('availability.json', defaultAvailability)
+  }
 }
 
 export const db = {
@@ -84,7 +111,7 @@ export const db = {
       })
       return Promise.resolve(items)
     },
-    create: (data: any) => {
+    create: ({ data }: any) => {
       initializeData()
       const menu = loadData('menu.json')
       if (!menu[data.category]) {
@@ -94,6 +121,26 @@ export const db = {
       menu[data.category].push(newItem)
       saveData('menu.json', menu)
       return Promise.resolve(newItem)
+    },
+    createMany: ({ data }: any) => {
+      initializeData()
+      const menu = loadData('menu.json')
+      let count = 0
+      data.forEach((item: any) => {
+        if (!menu[item.category]) {
+          menu[item.category] = []
+        }
+        const newItem = { ...item, id: Date.now().toString() + count }
+        menu[item.category].push(newItem)
+        count++
+      })
+      saveData('menu.json', menu)
+      return Promise.resolve({ count })
+    },
+    deleteMany: () => {
+      initializeData()
+      saveData('menu.json', {})
+      return Promise.resolve({ count: 0 })
     }
   },
   order: {
@@ -129,6 +176,11 @@ export const db = {
         return Promise.resolve(orders[where.id])
       }
       throw new Error('Order not found')
+    },
+    deleteMany: () => {
+      initializeData()
+      saveData('orders.json', {})
+      return Promise.resolve({ count: 0 })
     }
   },
   message: {
@@ -149,6 +201,61 @@ export const db = {
       messages[data.orderId].push(newMessage)
       saveData('messages.json', messages)
       return Promise.resolve(newMessage)
+    },
+    deleteMany: () => {
+      saveData('messages.json', {})
+      return Promise.resolve({ count: 0 })
+    }
+  },
+  orderItem: {
+    deleteMany: () => {
+      saveData('orderitems.json', {})
+      return Promise.resolve({ count: 0 })
+    }
+  },
+  rating: {
+    deleteMany: () => {
+      saveData('ratings.json', {})
+      return Promise.resolve({ count: 0 })
+    }
+  },
+  availability: {
+    findMany: () => {
+      initializeData()
+      const availability = loadData('availability.json')
+      return Promise.resolve(Object.values(availability))
+    },
+    findUnique: ({ where }: any) => {
+      initializeData()
+      const availability = loadData('availability.json')
+      return Promise.resolve(availability[where.date] || null)
+    },
+    create: ({ data }: any) => {
+      initializeData()
+      const availability = loadData('availability.json')
+      const newAvailability = { 
+        ...data, 
+        id: Date.now().toString()
+      }
+      availability[data.date] = newAvailability
+      saveData('availability.json', availability)
+      return Promise.resolve(newAvailability)
+    },
+    update: ({ where, data }: any) => {
+      initializeData()
+      const availability = loadData('availability.json')
+      const key = where.date || where.id
+      if (availability[key]) {
+        availability[key] = { ...availability[key], ...data }
+        saveData('availability.json', availability)
+        return Promise.resolve(availability[key])
+      }
+      throw new Error('Availability not found')
+    },
+    deleteMany: () => {
+      initializeData()
+      saveData('availability.json', {})
+      return Promise.resolve({ count: 0 })
     }
   }
 }

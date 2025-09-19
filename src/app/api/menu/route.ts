@@ -14,7 +14,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json()
-    const newItem = await db.menuItem.create(data)
+    const newItem = await db.menuItem.create({ data })
     return NextResponse.json(newItem)
   } catch (error) {
     console.error('Error creating menu item:', error)

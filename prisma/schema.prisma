@@ -87,7 +87,7 @@ model Rating {
 model Availability {
   id    String @id @default(cuid())
   date  String @unique
-  slots Json   // Array of available time slots
+  slots String @db.Text // JSON string of available time slots
 
   @@map("availability")
 }
