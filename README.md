@@ -1,30 +1,68 @@
 # 🍜 Nep-gappa - System Zamówień Jedzenia
 
-Kompleksowy system zamówień jedzenia z kalendarzem dostaw, zarządzaniem menu i panelem administratora.
+Nowoczesny system zamówień jedzenia zbudowany w Next.js 14 z TypeScript, Tailwind CSS i Prisma.
 
 ## 🚀 Funkcjonalności
 
 ### Dla użytkowników:
-- 📝 **Rejestracja i logowanie** - bezpieczne konta użytkowników
-- 🍽️ **Przeglądanie menu** - kategoryzowane pozycje z opisami i cenami
-- 📅 **Składanie zamówień** - wybór daty, godziny i adresu dostawy
-- 📋 **Historia zamówień** - śledzenie statusu własnych zamówień
-- 📞 **Kontakt** - łatwy dostęp do danych administratora
+- 📋 Formularz zamówienia z validacją (rodzaj wydarzenia, kalendarz, godzina, adres, liczba osób)
+- 🏠 Wybór wspólnoty i parafii
+- 🍽️ Responsywne menu z możliwością dodawania do koszyka
+- 📧 Automatyczne powiadomienia email
+- 📱 Pełna responsywność na wszystkich urządzeniach
+- 📊 Śledzenie statusu zamówienia
+- 💬 Czat z obsługą
+- ⭐ Ocena po dostarczeniu
 
 ### Dla administratorów:
-- 🏪 **Zarządzanie menu** - dodawanie pozycji w kategoriach
-- 💰 **Edycja cennika** - aktualizacja cen i opisów
-- 📦 **Zarządzanie zamówieniami** - przyjmowanie/odrzucanie zamówień
-- 👥 **Przegląd klientów** - pełne dane kontaktowe
-- 📊 **Panel administracyjny** - wszystko w jednym miejscu
+- 🔐 Panel administratora chroniony hasłem
+- 📝 Zarządzanie zamówieniami i zmiana statusów
+- 📋 Pełny podgląd danych kontaktowych
+- 💬 System czatu z klientami
+- 📊 Zarządzanie dostępnością
+- ✉️ Automatyczne powiadomienia
+
+## 🛠️ Technologie
+
+- **Next.js 14** z App Router
+- **TypeScript** - bezpieczny kod
+- **Tailwind CSS** - stylowanie
+- **Prisma** z SQLite - baza danych
+- **React** - komponenty UI
+
+## 📁 Struktura projektu
+
+```
+Nep-gappa/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── admin/             # Panel administratora
+│   │   ├── api/               # API Routes
+│   │   ├── order/[id]/        # Szczegóły zamówienia
+│   │   └── page.tsx           # Strona główna
+│   ├── components/            # Komponenty React
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Menu.tsx
+│   │   ├── OrderForm.tsx
+│   │   └── OrderDetail.tsx
+│   └── lib/                   # Biblioteki
+│       ├── db.ts              # Połączenie z bazą danych
+│       └── email.ts           # System powiadomień
+├── prisma/
+│   ├── schema.prisma          # Model bazy danych
+│   └── seed.ts                # Dane testowe
+├── public/                    # Pliki statyczne
+└── data/                      # Pliki JSON (utworzone automatycznie)
+```
 
 ## 🛠️ Instalacja i uruchomienie
 
 ### Wymagania:
-- Node.js (wersja 16 lub nowsza)
-- npm (Node Package Manager)
+- Node.js 18+ 
+- npm lub yarn
 
-### Instalacja:
+### Kroki instalacji:
 
 ```bash
 # Sklonuj repozytorium
@@ -34,147 +72,106 @@ cd Nep-gappa
 # Zainstaluj zależności
 npm install
 
-# Uruchom serwer
-npm start
+# Skonfiguruj środowisko
+cp .env.example .env.local
+
+# Zainicjuj bazę danych (opcjonalne - używa JSON files jako fallback)
+npm run db:push
+
+# Załaduj dane testowe
+npm run db:seed
+
+# Uruchom serwer deweloperski
+npm run dev
 ```
 
 ### Dostęp do aplikacji:
 
 Otwórz przeglądarkę i przejdź do: `http://localhost:3000`
 
-### Domyślne konto administratora:
-- **Login:** `admin`
-- **Hasło:** `admin123`
+### Konto administratora:
+- **Hasło:** `admin123` (można zmienić w `.env.local`)
+- **Panel:** `http://localhost:3000/admin`
 
-## 📱 Interfejs użytkownika
+## ⚙️ Konfiguracja
 
-### Strona główna
-![Strona główna](https://github.com/user-attachments/assets/fb4eaa9c-fd23-447f-bb9e-7d1b90b06d71)
+Utwórz plik `.env.local` na podstawie `.env.example`:
 
-### Panel zamówień użytkownika
-![Panel użytkownika](https://github.com/user-attachments/assets/9b651907-c69f-42cf-ab8a-8af3b2e320f0)
+```env
+# Database
+DATABASE_URL="file:./dev.db"
 
-### Panel administratora
-![Panel administratora](https://github.com/user-attachments/assets/25dc88c0-2895-4724-bd51-15e9a18e905d)
+# Admin Authentication
+ADMIN_PASSWORD="admin123"
 
-## 🏗️ Architektura techniczna
+# App Configuration  
+MAX_PEOPLE_COUNT="50"
 
-### Frontend:
-- **HTML5** - semantyczna struktura
-- **CSS3** - nowoczesne style z responsywnością
-- **JavaScript** - interaktywne funkcjonalności
-
-### Backend:
-- **Node.js** - środowisko uruchomieniowe
-- **Express.js** - framework webowy
-- **express-session** - zarządzanie sesjami
-- **bcryptjs** - hashowanie haseł
-- **uuid** - generowanie unikalnych identyfikatorów
-
-### Baza danych:
-- **JSON files** - proste przechowywanie danych w plikach
-
-## 📁 Struktura projektu
-
-```
-Nep-gappa/
-├── public/                 # Pliki frontend
-│   ├── css/
-│   │   └── style.css      # Style CSS
-│   ├── js/
-│   │   └── app.js         # Główna logika frontend
-│   ├── index.html         # Strona główna
-│   ├── login.html         # Strona logowania
-│   └── register.html      # Strona rejestracji
-├── data/                  # Pliki danych (tworzone automatycznie)
-│   ├── users.json        # Dane użytkowników
-│   ├── menu.json         # Dane menu
-│   └── orders.json       # Dane zamówień
-├── server.js             # Serwer Node.js
-├── package.json          # Konfiguracja npm
-└── README.md            # Ten plik
+# Next.js
+NEXTAUTH_SECRET="your-secret-key-here"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
 ## 🔧 API Endpoints
 
-### Autentykacja:
-- `POST /api/login` - Logowanie użytkownika
-- `POST /api/register` - Rejestracja nowego użytkownika
-- `POST /api/logout` - Wylogowanie użytkownika
-- `GET /api/session` - Sprawdzenie sesji użytkownika
-
 ### Menu:
 - `GET /api/menu` - Pobranie menu
-- `POST /api/menu` - Dodanie pozycji do menu (admin)
+- `POST /api/menu` - Dodanie pozycji (admin)
 
 ### Zamówienia:
-- `GET /api/orders` - Pobranie zamówień
-- `POST /api/orders` - Złożenie nowego zamówienia
-- `PATCH /api/orders/:id` - Aktualizacja statusu zamówienia (admin)
+- `GET /api/orders` - Lista zamówień
+- `POST /api/orders` - Nowe zamówienie
+- `PATCH /api/orders/[id]/status` - Zmiana statusu (admin)
 
-### Inne:
-- `GET /api/contact` - Informacje kontaktowe
+### Czat:
+- `GET /api/orders/[id]/messages` - Wiadomości
+- `POST /api/orders/[id]/messages` - Nowa wiadomość
 
-## 💡 Sposób użycia
+### Oceny:
+- `POST /api/orders/[id]/rating` - Dodaj ocenę
 
-### Dla nowych użytkowników:
-1. Wejdź na stronę główną
-2. Kliknij "Zarejestruj" i utwórz konto
-3. Zaloguj się używając swoich danych
-4. Przeglądaj menu i dodawaj pozycje do koszyka
-5. Wypełnij formularz dostawy i złóż zamówienie
-6. Śledź status zamówienia w sekcji "Moje zamówienia"
+### Admin:
+- `POST /api/admin/login` - Logowanie
 
-### Dla administratorów:
-1. Zaloguj się jako admin (`admin` / `admin123`)
-2. Przejdź do "Panel administratora"
-3. Zarządzaj menu w zakładce "Menu"
-4. Przeglądaj i akceptuj zamówienia w zakładce "Zamówienia"
+## 📱 Interfejs użytkownika
+
+- **Responsywny design** - dostosowany do wszystkich urządzeń
+- **Brand colors** - używa koloru #e65d2a jako głównego
+- **Polski język** - pełne tłumaczenie interfejsu
+- **Jasny motyw** - czytelny i nowoczesny
 
 ## 🔒 Bezpieczeństwo
 
-- Hasła są hashowane przy użyciu bcrypt
-- Sesje użytkowników są zabezpieczone
-- Wszystkie operacje administratora wymagają autoryzacji
-- Walidacja danych po stronie serwera
-
-## 🌟 Funkcjonalności szczegółowe
-
-### System zamówień:
-- ✅ Kalendarz z wyborem daty dostawy
-- ✅ Wybór godziny dostawy
-- ✅ Pole na adres dostawy
-- ✅ Opcjonalne uwagi do zamówienia
-- ✅ Automatyczne obliczanie sumy
-- ✅ Historia zamówień użytkownika
-
-### Panel administratora:
-- ✅ Dodawanie pozycji menu w kategoriach
-- ✅ Edycja cen i opisów
-- ✅ Akceptowanie/odrzucanie zamówień
-- ✅ Podgląd danych kontaktowych klientów
-- ✅ Zarządzanie wszystkimi zamówieniami
-
-### Responsywność:
-- ✅ Działa na komputerach
-- ✅ Dostosowane do tabletów
-- ✅ Zoptymalizowane dla smartfonów
+- Walidacja danych po stronie serwera i klienta
+- Zabezpieczone sesje administratora
+- Ograniczenia liczby osób (konfigurowane)
+- Sanityzacja danych wejściowych
 
 ## 📞 Wsparcie
 
-W przypadku problemów lub pytań, skontaktuj się z administratorem:
+W przypadku problemów lub pytań:
 - **Telefon:** +48 123 456 789
 - **Email:** kontakt@nep-gappa.pl
 - **Adres:** ul. Przykładowa 123, 00-000 Warszawa
 
 ## 🚀 Rozwój
 
-Projekt jest gotowy do dalszego rozwoju. Możliwe rozszerzenia:
+### Dostępne skrypty:
+```bash
+npm run dev       # Serwer deweloperski
+npm run build     # Budowanie produkcyjne
+npm run start     # Start serwera produkcyjnego
+npm run lint      # Linting kodu
+npm run db:push   # Aktualizacja bazy danych
+npm run db:seed   # Ładowanie danych testowych
+```
+
+### Możliwe rozszerzenia:
 - Płatności online
-- Powiadomienia email/SMS
+- Powiadomienia SMS
 - Integracja z mapami
-- System ocen i komentarzy
 - Aplikacja mobilna
+- Zaawansowane raportowanie
 
 ## 📄 Licencja
 

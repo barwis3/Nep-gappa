@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
+  env: {
+    MAX_PEOPLE_COUNT: process.env.MAX_PEOPLE_COUNT || '50',
   },
 }
 
