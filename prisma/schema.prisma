@@ -7,103 +7,89 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  // korzystaj z .env
   url      = env("DATABASE_URL")
 }
 
 model MenuItem {
   id          String      @id @default(cuid())
   name        String
-  description String
-  priceCents  Int
+  description String?
+  price       Float
   category    String
-  active      Boolean     @default(true)
-  orderItems  OrderItem[]
+  available   Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  OrderItem   OrderItem[]
 
   @@map("menu_items")
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  status        OrderStatus @default(PENDING)
-  statusReason  String?
-  eventType     EventType
-  dateTime      DateTime
-  address       String
-  peopleCount   Int
-  minPeople     Int
-  subtotalCents Int
-  community     String
-  parish        String
-  userName      String
-  userEmail     String
-  userPhone     String
-  items         OrderItem[]
-  messages      Message[]
-  rating        Rating?
+  id              String      @id @default(cuid())
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  eventType       String
+  deliveryDate    String
+  deliveryTime    String
+  address         String
+  peopleCount     Int
+  community       String?
+  parish          String?
+  notes           String?
+  status          String      @default("pending")
+  rejectionReason String?
+  total           Float
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+  messages        Message[]
+  rating          Rating?
 
   @@map("orders")
 }
 
 model OrderItem {
-  id         String    @id @default(cuid())
+  id         String   @id @default(cuid())
   orderId    String
   menuItemId String
   quantity   Int
-  unitCents  Int
-  totalCents Int
-  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  menuItem   MenuItem  @relation(fields: [menuItemId], references: [id])
+  price      Float
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
 
   @@map("order_items")
 }
 
 model Message {
-  id        String      @id @default(cuid())
+  id        String   @id @default(cuid())
   orderId   String
-  sender    MessageSender
-  body      String
-  createdAt DateTime    @default(now())
-  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  content   String
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
 
 model Rating {
-  id         String  @id @default(cuid())
-  orderId    String  @unique
-  stars      Int
-  comment    String?
-  adminReply String?
-  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  rating    Int
+  comment   String?
+  response  String?
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("ratings")
 }
 
 model Availability {
-  id          String   @id @default(cuid())
-  date        DateTime @unique
-  isAvailable Boolean  @default(true)
-  note        String?
+  id    String @id @default(cuid())
+  date  String @unique
+  // JSON jako tekst (SQLite nie wspiera typu Json)
+  slots String @db.Text
 
   @@map("availability")
-}
-
-enum OrderStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-  IN_DELIVERY
-  DELIVERED
-}
-
-enum EventType {
-  AGAPA
-  IMPREZA_OKOLICZNOSCIOWA
-}
-
-enum MessageSender {
-  USER
-  ADMIN
 }
