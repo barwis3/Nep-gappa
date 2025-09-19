@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model MenuItem {
+  id          String      @id @default(cuid())
+  name        String
+  description String
+  priceCents  Int
+  category    String
+  active      Boolean     @default(true)
+  orderItems  OrderItem[]
+
+  @@map("menu_items")
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  status        OrderStatus @default(PENDING)
+  statusReason  String?
+  eventType     EventType
+  dateTime      DateTime
+  address       String
+  peopleCount   Int
+  minPeople     Int
+  subtotalCents Int
+  community     String
+  parish        String
+  userName      String
+  userEmail     String
+  userPhone     String
+  items         OrderItem[]
+  messages      Message[]
+  rating        Rating?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String    @id @default(cuid())
+  orderId    String
+  menuItemId String
+  quantity   Int
+  unitCents  Int
+  totalCents Int
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem  @relation(fields: [menuItemId], references: [id])
+
+  @@map("order_items")
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  orderId   String
+  sender    MessageSender
+  body      String
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Rating {
+  id         String  @id @default(cuid())
+  orderId    String  @unique
+  stars      Int
+  comment    String?
+  adminReply String?
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("ratings")
+}
+
+model Availability {
+  id          String   @id @default(cuid())
+  date        DateTime @unique
+  isAvailable Boolean  @default(true)
+  note        String?
+
+  @@map("availability")
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  IN_DELIVERY
+  DELIVERED
+}
+
+enum EventType {
+  AGAPA
+  IMPREZA_OKOLICZNOSCIOWA
+}
+
+enum MessageSender {
+  USER
+  ADMIN
+}
